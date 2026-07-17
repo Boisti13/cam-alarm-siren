@@ -2,7 +2,7 @@
 
 ESPHome firmware that turns an [M5Stack Atom Echo](https://github.com/m5stack/ATOM-ECHO) into a WiFi-connected alarm
 siren. Built to sound off when a Home Assistant camera motion sensor trips, but the `Alarm Siren` switch works from
-any automation, the device's own web UI, or Home Assistant directly.
+any Home Assistant automation or the dashboard directly.
 
 ## Hardware
 
