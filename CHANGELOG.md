@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the alarm plays before auto-stopping.
 - `Alarm Cooldown` number entity (0-300s, default 15s) gating how soon motion can re-trigger the siren after it
   stops. Manual on/off (button, dashboard) is unaffected.
+- `Alarm Volume` number entity (0-100%, default 80%) controlling siren playback volume via the rtttl component's
+  `set_gain()`, only adjustable from Home Assistant.
 - Physical button cancels the alarm instantly on press.
 - A `homeassistant` binary_sensor mirrors the motion sensor's state onto the device directly, driving the siren
   switch on `on_press`/`on_release` — no Home Assistant automation needed.

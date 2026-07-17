@@ -28,6 +28,8 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
 - **Alarm Cooldown number** (0–300s, default 15s) — after the alarm stops (by duration, button, or motion
   clearing), motion won't re-trigger it again until this cooldown elapses. Doesn't affect manually turning the
   siren on/off yourself.
+- **Alarm Volume number** (0–100%, default 80%) — adjusts the siren's playback volume. Takes effect on the next
+  loop of the siren tone (~1s), only adjustable from Home Assistant.
 - **Button cancel** — a press of the physical button silences the alarm immediately.
 - Native Home Assistant API integration (auto-discovered via mDNS) and OTA updates.
 
