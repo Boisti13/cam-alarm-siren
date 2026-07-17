@@ -30,6 +30,11 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
   siren on/off yourself.
 - **Alarm Volume number** (0–100%, default 80%) — adjusts the siren's playback volume. Takes effect on the next
   loop of the siren tone (~1s), only adjustable from Home Assistant.
+- **Standby LED** — while idle, the Status LED shows a standby color (default green, ~20% brightness), turning
+  on as soon as the device connects to Home Assistant. It's just the same `Status LED` light entity, so its
+  color/brightness are adjustable from Home Assistant like any light; whatever you set persists across alarms
+  and reboots. When the alarm fires, the LED switches to full-brightness red blinking, then returns to the
+  standby look when the alarm stops.
 - **Button cancel** — a press of the physical button silences the alarm immediately.
 - Native Home Assistant API integration (auto-discovered via mDNS) and OTA updates.
 

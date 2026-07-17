@@ -18,6 +18,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   stops. Manual on/off (button, dashboard) is unaffected.
 - `Alarm Volume` number entity (0-100%, default 80%) controlling siren playback volume via the rtttl component's
   `set_gain()`, only adjustable from Home Assistant.
+- Standby LED state (default green, ~20% brightness) shown whenever the alarm isn't active, applied as soon as
+  the device connects to Home Assistant (`api.on_client_connected`). Reuses the existing `Status LED` light
+  entity, so its color/brightness are adjustable from Home Assistant directly; the last-set values persist
+  across alarms and reboots via globals with `restore_value`. Capturing the standby color is gated on a
+  dedicated `alarm_active` flag rather than the switch's own reported state, since the switch only publishes
+  its new state *after* its action list runs — checking `switch.is_off` at the moment the LED turns red would
+  otherwise race and capture the alarm color as "standby". The LED switches to full-brightness red blinking
+  during an active alarm and returns to standby once it stops.
 - Physical button cancels the alarm instantly on press.
 - A `homeassistant` binary_sensor mirrors the motion sensor's state onto the device directly, driving the siren
   switch on `on_press`/`on_release` — no Home Assistant automation needed.
