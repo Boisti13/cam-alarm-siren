@@ -1,3 +1,5 @@
+substitutions: !include ha_entities.yaml
+
 esphome:
   name: cam-alarm-siren
   friendly_name: Camera Alarm Siren
@@ -29,6 +31,12 @@ wifi:
     password: !secret ap_password
 
 captive_portal:
+
+globals:
+  - id: in_cooldown
+    type: bool
+    restore_value: no
+    initial_value: 'false'
 
 i2s_audio:
   - id: i2s_audio_bus
@@ -81,6 +89,18 @@ number:
     step: 1
     unit_of_measurement: "s"
 
+  - platform: template
+    name: "Alarm Cooldown"
+    id: alarm_cooldown
+    icon: mdi:timer-sand
+    optimistic: true
+    restore_value: true
+    initial_value: 15
+    min_value: 0
+    max_value: 300
+    step: 1
+    unit_of_measurement: "s"
+
 switch:
   - platform: template
     name: "Alarm Siren"
@@ -102,6 +122,11 @@ switch:
       - rtttl.stop
       - light.turn_off:
           id: led
+      - lambda: |-
+          id(in_cooldown) = true;
+      - delay: !lambda "return (uint32_t) (id(alarm_cooldown).state * 1000);"
+      - lambda: |-
+          id(in_cooldown) = false;
 
 binary_sensor:
   - platform: gpio
@@ -111,6 +136,18 @@ binary_sensor:
     name: "Button"
     id: echo_button
     on_press:
+      - switch.turn_off: alarm_siren
+
+  - platform: homeassistant
+    id: cam_motion
+    entity_id: ${cam_motion_entity}
+    on_press:
+      - if:
+          condition:
+            lambda: "return !id(in_cooldown);"
+          then:
+            - switch.turn_on: alarm_siren
+    on_release:
       - switch.turn_off: alarm_siren
 
 button:

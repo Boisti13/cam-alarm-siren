@@ -25,6 +25,9 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
 - **Alarm Siren switch** — loops a two-tone RTTTL siren through the speaker and flashes the LED red while on.
 - **Siren Duration number** (1–300s, default 30s) — the alarm auto-stops after this long. Only adjustable from
   Home Assistant (no local web UI).
+- **Alarm Cooldown number** (0–300s, default 15s) — after the alarm stops (by duration, button, or motion
+  clearing), motion won't re-trigger it again until this cooldown elapses. Doesn't affect manually turning the
+  siren on/off yourself.
 - **Button cancel** — a press of the physical button silences the alarm immediately.
 - Native Home Assistant API integration (auto-discovered via mDNS) and OTA updates.
 
@@ -49,40 +52,17 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
    esphome upload cam-alarm-siren.yaml --device cam-alarm-siren.local
    ```
 
-## Wiring it to a motion sensor in Home Assistant
+## Wiring it to a motion sensor
 
-Once flashed, the device is auto-discovered by Home Assistant's ESPHome integration. Create an automation that
-triggers the `switch.camera_alarm_siren_alarm_siren` entity when your motion sensor activates, e.g. using the
-purpose-specific `motion.detected` / `motion.cleared` triggers. See [ha_entities.yaml](ha_entities.yaml) for the
-entities this project expects on the Home Assistant side:
+No Home Assistant automation is needed — the device handles this itself. `cam-alarm-siren.yaml` includes
+[ha_entities.yaml](ha_entities.yaml) as its `substitutions:`, which defines `cam_motion_entity`: the Home Assistant
+motion `binary_sensor` to watch. A `homeassistant` binary_sensor platform mirrors that entity's state onto the
+device directly, and its `on_press`/`on_release` actions turn the `Alarm Siren` switch on/off in response —
+entirely within the ESPHome config.
 
-```yaml
-triggers:
-  - trigger: motion.detected
-    target:
-      entity_id: binary_sensor.your_motion_sensor
-    id: motion_on
-  - trigger: motion.cleared
-    target:
-      entity_id: binary_sensor.your_motion_sensor
-    id: motion_off
-actions:
-  - choose:
-      - conditions:
-          - condition: trigger
-            id: motion_on
-        sequence:
-          - action: switch.turn_on
-            target:
-              entity_id: switch.camera_alarm_siren_alarm_siren
-      - conditions:
-          - condition: trigger
-            id: motion_off
-        sequence:
-          - action: switch.turn_off
-            target:
-              entity_id: switch.camera_alarm_siren_alarm_siren
-```
+To point this at your own motion sensor, just change `cam_motion_entity` in `ha_entities.yaml` to its entity_id
+and reflash. Requires Home Assistant's API connection to be up (native ESPHome integration, auto-discovered via
+mDNS) since that's how the device reads the entity's state.
 
 ## License
 
