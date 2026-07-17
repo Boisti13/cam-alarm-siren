@@ -23,11 +23,9 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
 ## Features
 
 - **Alarm Siren switch** — loops a two-tone RTTTL siren through the speaker and flashes the LED red while on.
-- **Siren Duration number** (1–300s, default 30s) — the alarm auto-stops after this long. Adjustable from Home
-  Assistant, or directly from the device's own web UI.
+- **Siren Duration number** (1–300s, default 30s) — the alarm auto-stops after this long. Only adjustable from
+  Home Assistant (no local web UI).
 - **Button cancel** — a press of the physical button silences the alarm immediately.
-- **Local web UI** (`web_server`) — reachable at `http://cam-alarm-siren.local` for control/monitoring without
-  Home Assistant.
 - Native Home Assistant API integration (auto-discovered via mDNS) and OTA updates.
 
 ## Setup

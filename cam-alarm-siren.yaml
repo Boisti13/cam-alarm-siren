@@ -30,9 +30,6 @@ wifi:
 
 captive_portal:
 
-web_server:
-  version: 3
-
 i2s_audio:
   - id: i2s_audio_bus
     i2s_lrclk_pin: GPIO33
