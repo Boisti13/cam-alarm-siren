@@ -1,0 +1,37 @@
+# Reference only — NOT deployed to ESPHome or Home Assistant.
+#
+# Documents the Home Assistant entities this project integrates with, since
+# the incoming sensor is a live entity from a config-entry integration (ONVIF)
+# and can't be defined in code the way the ESPHome side can.
+
+incoming:
+  - entity_id: binary_sensor.cam_pt2_motion_alarm
+    name: "Motion Alarm"
+    platform: onvif
+    device_class: motion
+    defined_in: >
+      Not YAML. Created by the ONVIF integration config entry for camera
+      "PT2" (Settings > Devices & Services > ONVIF). Fires an ONVIF
+      VideoSource/MotionAlarm event.
+    triggers_used:
+      - motion.detected   # should switch the siren on
+      - motion.cleared    # should switch the siren off
+
+outgoing:
+  - entity_id: switch.camera_alarm_siren_alarm_siren
+    name: "Camera Alarm Siren Alarm Siren"
+    platform: esphome
+    defined_in: cam-alarm-siren.yaml (switch: block)
+    description: >
+      Auto-discovered by Home Assistant's ESPHome integration once the
+      device is flashed and connected to the network.
+
+automation:
+  status: not yet created
+  note: >
+    No automation currently links the two entities above — the siren does
+    not yet react to motion. Create one via Settings > Automations (or the
+    HA config API) using motion.detected / motion.cleared triggers targeting
+    binary_sensor.cam_pt2_motion_alarm, with switch.turn_on / switch.turn_off
+    actions on switch.camera_alarm_siren_alarm_siren. See README.md for the
+    full example.

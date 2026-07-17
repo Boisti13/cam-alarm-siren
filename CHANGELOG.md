@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- `ha_entities.yaml` — reference doc listing the Home Assistant entities this project depends on (incoming motion
+  sensor) and produces (outgoing siren switch), since the motion sensor is a live ONVIF entity that can't be
+  defined in code.
 - Initial ESPHome configuration for the M5Stack Atom Echo.
 - `Alarm Siren` template switch that loops an RTTTL alarm tone through the onboard I2S speaker and flashes the
   SK6812 LED red while active.

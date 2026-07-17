@@ -54,8 +54,9 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
 ## Wiring it to a motion sensor in Home Assistant
 
 Once flashed, the device is auto-discovered by Home Assistant's ESPHome integration. Create an automation that
-triggers the `switch.cam_alarm_siren_alarm_siren` entity when your motion sensor activates, e.g. using the
-purpose-specific `motion.detected` / `motion.cleared` triggers:
+triggers the `switch.camera_alarm_siren_alarm_siren` entity when your motion sensor activates, e.g. using the
+purpose-specific `motion.detected` / `motion.cleared` triggers. See [ha_entities.yaml](ha_entities.yaml) for the
+entities this project expects on the Home Assistant side:
 
 ```yaml
 triggers:
@@ -75,14 +76,14 @@ actions:
         sequence:
           - action: switch.turn_on
             target:
-              entity_id: switch.cam_alarm_siren_alarm_siren
+              entity_id: switch.camera_alarm_siren_alarm_siren
       - conditions:
           - condition: trigger
             id: motion_off
         sequence:
           - action: switch.turn_off
             target:
-              entity_id: switch.cam_alarm_siren_alarm_siren
+              entity_id: switch.camera_alarm_siren_alarm_siren
 ```
 
 ## License
