@@ -21,17 +21,20 @@ outgoing:
   - entity_id: switch.camera_alarm_siren_alarm_siren
     name: "Camera Alarm Siren Alarm Siren"
     platform: esphome
-    defined_in: cam-alarm-siren.yaml (switch: block)
+    defined_in: "cam-alarm-siren.yaml (switch: block)"
     description: >
       Auto-discovered by Home Assistant's ESPHome integration once the
       device is flashed and connected to the network.
 
 automation:
-  status: not yet created
-  note: >
-    No automation currently links the two entities above — the siren does
-    not yet react to motion. Create one via Settings > Automations (or the
-    HA config API) using motion.detected / motion.cleared triggers targeting
-    binary_sensor.cam_pt2_motion_alarm, with switch.turn_on / switch.turn_off
-    actions on switch.camera_alarm_siren_alarm_siren. See README.md for the
-    full example.
+  entity_id: automation.camera_alarm_siren_pt2_motion
+  status: created
+  defined_in: >
+    Not YAML. Created via the HA config API (ha_config_set_automation), so
+    it lives in Home Assistant's automations.yaml, not in this repo. See
+    Settings > Automations > "Camera Alarm Siren - PT2 Motion" to view/edit.
+  logic: >
+    motion.detected on binary_sensor.cam_pt2_motion_alarm -> switch.turn_on
+    on switch.camera_alarm_siren_alarm_siren. motion.cleared -> switch.turn_off.
+    The siren's own Siren Duration auto-off and the physical button remain
+    as a backstop/manual override on top of this.
