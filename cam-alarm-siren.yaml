@@ -3,24 +3,39 @@ substitutions: !include ha_entities.yaml
 esphome:
   name: cam-alarm-siren
   friendly_name: Camera Alarm Siren
+  on_boot:
+    priority: -100
+    then:
+      - lambda: |-
+          id(booted) = true;
+          auto call = id(led).turn_on();
+          call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
+          call.set_brightness(id(standby_brightness));
+          call.set_effect("None");
+          call.perform();
 
 esp32:
   board: m5stack-atom
   framework:
     type: esp-idf
 
+# Confirm boot as good almost immediately, instead of the 1-minute default,
+# to minimize the window in which a reset (e.g. brief power sag on the WiFi
+# radio's transmit bursts) causes an OTA rollback to a much older build.
+safe_mode:
+  boot_is_good_after: 5s
+
 # Enable Home Assistant API
 api:
   encryption:
     key: !secret cam_alarm_siren_key
   on_client_connected:
-    - light.turn_on:
-        id: led
-        red: !lambda "return id(standby_red);"
-        green: !lambda "return id(standby_green);"
-        blue: !lambda "return id(standby_blue);"
-        brightness: !lambda "return id(standby_brightness);"
-        effect: "None"
+    - lambda: |-
+        auto call = id(led).turn_on();
+        call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
+        call.set_brightness(id(standby_brightness));
+        call.set_effect("None");
+        call.perform();
 
 ota:
   - platform: esphome
@@ -51,6 +66,11 @@ globals:
     restore_value: no
     initial_value: 'false'
 
+  - id: booted
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
   - id: standby_red
     type: float
     restore_value: yes
@@ -66,7 +86,7 @@ globals:
   - id: standby_brightness
     type: float
     restore_value: yes
-    initial_value: '0.20'
+    initial_value: '0.15'
 
 i2s_audio:
   - id: i2s_audio_bus
@@ -110,7 +130,7 @@ light:
       then:
         - if:
             condition:
-              lambda: "return !id(alarm_active);"
+              lambda: "return id(booted) && !id(alarm_active);"
             then:
               - lambda: |-
                   id(standby_red) = id(led).current_values.get_red();
@@ -182,13 +202,16 @@ switch:
       - rtttl.stop
       - lambda: |-
           id(alarm_active) = false;
-      - light.turn_on:
-          id: led
-          red: !lambda "return id(standby_red);"
-          green: !lambda "return id(standby_green);"
-          blue: !lambda "return id(standby_blue);"
-          brightness: !lambda "return id(standby_brightness);"
-          effect: "None"
+      - if:
+          condition:
+            lambda: "return id(booted);"
+          then:
+            - lambda: |-
+                auto call = id(led).turn_on();
+                call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
+                call.set_brightness(id(standby_brightness));
+                call.set_effect("None");
+                call.perform();
       - lambda: |-
           id(in_cooldown) = true;
       - delay: !lambda "return (uint32_t) (id(alarm_cooldown).state * 1000);"
