@@ -38,6 +38,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - A `homeassistant` binary_sensor mirrors the motion sensor's state onto the device directly, driving the siren
   switch on `on_press`/`on_release` — no Home Assistant automation needed.
 - Home Assistant API integration with encrypted connection and OTA updates.
+- `wifi: power_save_mode: light` to reduce average power draw (WiFi modem sleeps between beacon intervals), and
+  `logger: level: WARN` (was DEBUG) to cut the ongoing serial/CPU logging overhead — neither noticeably affects
+  responsiveness for this use case.
 
 ### Removed
 - The Home Assistant-side automation wiring motion events to the siren switch, superseded by the device handling

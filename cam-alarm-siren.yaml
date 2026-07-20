@@ -42,11 +42,12 @@ ota:
     password: "d3ccb629166b234c572a5bf5c91d2127"
 
 logger:
+  level: WARN
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  power_save_mode: none
+  power_save_mode: light
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
