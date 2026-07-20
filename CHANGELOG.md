@@ -12,8 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Initial ESPHome configuration for the M5Stack Atom Echo.
 - `Alarm Siren` template switch that loops an RTTTL alarm tone through the onboard I2S speaker and flashes the
   SK6812 LED red while active.
-- `Siren Duration` number entity (1-300s, default 30s, only adjustable from Home Assistant) controlling how long
+- `Alarm Duration` number entity (1-300s, default 15s, only adjustable from Home Assistant) controlling how long
   the alarm plays before auto-stopping.
+- `Status LED` switch entity (default on) to disable the idle green standby indicator entirely. Only affects
+  standby — an active alarm still shows full red blinking regardless of this setting.
 - `Alarm Cooldown` number entity (0-300s, default 15s) gating how soon motion can re-trigger the siren after it
   stops. Manual on/off (button, dashboard) is unaffected.
 - `Alarm Volume` number entity (0-100%, default 80%) controlling siren playback volume via the rtttl component's
@@ -34,6 +36,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
     `light.turn_on:` action, which proved unreliable for this platform.
   - `safe_mode: boot_is_good_after: 5s` (default 60s) shrinks the window in which an unrelated reset before boot
     is confirmed would cause ESP-IDF to roll back to a previous OTA image.
+  - The capture guard also checks `status_led_enabled`, since `id(led).turn_off()` (used when the Status LED
+    switch is off) doesn't clear the light's color channels — only its on/off state — so without this, ending
+    an alarm while the switch is off would capture the alarm's red as the new "standby" color.
 - Physical button cancels the alarm instantly on press.
 - A `homeassistant` binary_sensor mirrors the motion sensor's state onto the device directly, driving the siren
   switch on `on_press`/`on_release` — no Home Assistant automation needed.

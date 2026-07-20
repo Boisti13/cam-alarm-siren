@@ -23,7 +23,7 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
 ## Features
 
 - **Alarm Siren switch** — loops a two-tone RTTTL siren through the speaker and flashes the LED red while on.
-- **Siren Duration number** (1–300s, default 30s) — the alarm auto-stops after this long. Only adjustable from
+- **Alarm Duration number** (1–300s, default 15s) — the alarm auto-stops after this long. Only adjustable from
   Home Assistant (no local web UI).
 - **Alarm Cooldown number** (0–300s, default 15s) — after the alarm stops (by duration, button, or motion
   clearing), motion won't re-trigger it again until this cooldown elapses. Doesn't affect manually turning the
@@ -34,6 +34,8 @@ M5Stack Atom Echo (ESP32-PICO-D4), using its onboard:
   at boot. It's just the same `Status LED` light entity, so its color/brightness are adjustable from Home
   Assistant like any light; whatever you set persists across alarms and reboots. When the alarm fires, the LED
   switches to full-brightness red blinking, then returns to the standby look when the alarm stops.
+- **Status LED switch** (default on) — turn off to disable the idle standby indicator entirely. Only affects
+  standby; an active alarm still blinks full red regardless of this setting.
 - **Button cancel** — a press of the physical button silences the alarm immediately.
 - Native Home Assistant API integration (auto-discovered via mDNS) and OTA updates.
 

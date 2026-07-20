@@ -8,11 +8,15 @@ esphome:
     then:
       - lambda: |-
           id(booted) = true;
-          auto call = id(led).turn_on();
-          call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
-          call.set_brightness(id(standby_brightness));
-          call.set_effect("None");
-          call.perform();
+          if (id(status_led_enabled).state) {
+            auto call = id(led).turn_on();
+            call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
+            call.set_brightness(id(standby_brightness));
+            call.set_effect("None");
+            call.perform();
+          } else {
+            id(led).turn_off().perform();
+          }
 
 esp32:
   board: m5stack-atom
@@ -31,11 +35,15 @@ api:
     key: !secret cam_alarm_siren_key
   on_client_connected:
     - lambda: |-
-        auto call = id(led).turn_on();
-        call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
-        call.set_brightness(id(standby_brightness));
-        call.set_effect("None");
-        call.perform();
+        if (id(status_led_enabled).state) {
+          auto call = id(led).turn_on();
+          call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
+          call.set_brightness(id(standby_brightness));
+          call.set_effect("None");
+          call.perform();
+        } else {
+          id(led).turn_off().perform();
+        }
 
 ota:
   - platform: esphome
@@ -131,7 +139,7 @@ light:
       then:
         - if:
             condition:
-              lambda: "return id(booted) && !id(alarm_active);"
+              lambda: "return id(booted) && !id(alarm_active) && id(status_led_enabled).state;"
             then:
               - lambda: |-
                   id(standby_red) = id(led).current_values.get_red();
@@ -141,12 +149,12 @@ light:
 
 number:
   - platform: template
-    name: "Siren Duration"
-    id: siren_duration
+    name: "Alarm Duration"
+    id: alarm_duration
     icon: mdi:timer-outline
     optimistic: true
     restore_value: true
-    initial_value: 30
+    initial_value: 15
     min_value: 1
     max_value: 300
     step: 1
@@ -197,7 +205,7 @@ switch:
           brightness: 100%
           effect: "fast_pulse"
       - rtttl.play: "alarm:d=8,o=6,b=200:c,g,c,g,c,g,c,g,c,g,c,g,c,g,c,g"
-      - delay: !lambda "return (uint32_t) (id(siren_duration).state * 1000);"
+      - delay: !lambda "return (uint32_t) (id(alarm_duration).state * 1000);"
       - switch.turn_off: alarm_siren
     turn_off_action:
       - rtttl.stop
@@ -208,16 +216,45 @@ switch:
             lambda: "return id(booted);"
           then:
             - lambda: |-
-                auto call = id(led).turn_on();
-                call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
-                call.set_brightness(id(standby_brightness));
-                call.set_effect("None");
-                call.perform();
+                if (id(status_led_enabled).state) {
+                  auto call = id(led).turn_on();
+                  call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
+                  call.set_brightness(id(standby_brightness));
+                  call.set_effect("None");
+                  call.perform();
+                } else {
+                  id(led).turn_off().perform();
+                }
       - lambda: |-
           id(in_cooldown) = true;
       - delay: !lambda "return (uint32_t) (id(alarm_cooldown).state * 1000);"
       - lambda: |-
           id(in_cooldown) = false;
+
+  - platform: template
+    name: "Status LED"
+    id: status_led_enabled
+    icon: mdi:led-on
+    optimistic: true
+    restore_mode: ALWAYS_ON
+    turn_on_action:
+      - if:
+          condition:
+            lambda: "return id(booted) && !id(alarm_active);"
+          then:
+            - lambda: |-
+                auto call = id(led).turn_on();
+                call.set_rgb(id(standby_red), id(standby_green), id(standby_blue));
+                call.set_brightness(id(standby_brightness));
+                call.set_effect("None");
+                call.perform();
+    turn_off_action:
+      - if:
+          condition:
+            lambda: "return !id(alarm_active);"
+          then:
+            - lambda: |-
+                id(led).turn_off().perform();
 
 binary_sensor:
   - platform: gpio
